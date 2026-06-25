@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>생활지도 누가기록</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #F4F3F0;
+  --surface:  #FFFFFF;
+  --surface2: #F8F7F5;
+  --surface3: #EEECEA;
+
+  --border:   #E8E5E0;
+  --border2:  #D8D4CE;
+
+  --text:     #1A1917;
+  --text2:    #6A6762;
+  --text3:    #A8A5A0;
+
+  --blue:     #2563EB;
+  --blue-bg:  #EFF6FF;
+  --blue-mid: #BFDBFE;
+
+  --green:    #059669;
+  --green-bg: #ECFDF5;
+
+  --red:      #DC2626;
+  --red-bg:   #FEF2F2;
+
+  --r: 10px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow:    0 1px 4px rgba(0,0,0,0.07), 0 4px 12px rgba(0,0,0,0.05);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body {
+  font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* ── LAYOUT ── */
+.app { display: flex; min-height: 100vh; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 236px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sb-brand {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.sb-brand-mark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+.sb-icon {
+  width: 32px; height: 32px;
+  background: var(--blue);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.sb-name { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+.sb-desc { font-size: 11px; color: var(--text3); padding-left: 42px; }
+
+.sb-nav {
+  padding: 14px 12px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.sb-nav-label {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text3);
+  padding: 0 8px;
+  margin-bottom: 6px;
+}
+.nav-btn {
+  display: flex; align-items: center; gap: 9px;
+  width: 100%; padding: 9px 10px;
+  border: none; background: none;
+  border-radius: var(--r); cursor: pointer;
+  font-size: 13px; font-family: inherit;
+  color: var(--text2); text-align: left;
+  transition: background 0.12s, color 0.12s;
+}
+.nav-btn:hover { background: var(--surface2); color: var(--text); }
+.nav-btn.active { background: var(--blue-bg); color: var(--blue); font-weight: 600; }
+.nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+.sb-bans { padding: 14px 12px; flex: 1; }
+.ban-btn {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; padding: 8px 10px;
+  border: none; background: none;
+  border-radius: var(--r); cursor: pointer;
+  font-size: 13px; font-family: inherit;
+  color: var(--text2); text-align: left;
+  transition: background 0.12s, color 0.12s;
+}
+.ban-btn:hover { background: var(--surface2); color: var(--text); }
+.ban-btn.active { background: var(--blue-bg); color: var(--blue); font-weight: 700; }
+.ban-dot {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--surface3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--text3);
+  flex-shrink: 0; transition: background 0.12s, color 0.12s;
+}
+.ban-btn.active .ban-dot { background: var(--blue); color: #fff; }
+.ban-name { flex: 1; }
+.ban-cnt {
+  font-size: 10px; font-weight: 700;
+  padding: 2px 7px; border-radius: 99px;
+  background: var(--surface3); color: var(--text3);
+  min-width: 20px; text-align: center;
+}
+.ban-btn.active .ban-cnt { background: var(--blue); color: #fff; }
+
+/* ── MAIN ── */
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 28px;
+  display: flex; align-items: center; gap: 16px;
+  position: sticky; top: 0; z-index: 10;
+}
+.topbar-title { font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+.topbar-sub {
+  font-size: 12px; color: var(--text3);
+  background: var(--surface3);
+  padding: 2px 8px; border-radius: 99px;
+}
+.topbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.search-wrap { position: relative; }
+.search-icon {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  font-size: 13px; color: var(--text3); pointer-events: none;
+}
+.search-input {
+  width: 210px; padding: 8px 12px 8px 33px;
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  background: var(--surface2);
+  font-size: 13px; font-family: inherit;
+  color: var(--text); outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.search-input:focus { border-color: var(--blue); background: var(--surface); }
+.search-input::placeholder { color: var(--text3); }
+
+/* ── CONTENT ── */
+.content { padding: 24px 28px 60px; }
+
+/* ── STAT STRIP ── */
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 16px 18px;
+  box-shadow: var(--shadow-sm);
+}
+.stat-card-label { font-size: 11px; color: var(--text3); font-weight: 500; margin-bottom: 6px; }
+.stat-card-val { font-size: 28px; font-weight: 700; color: var(--text); letter-spacing: -0.03em; line-height: 1; }
+.stat-card-unit { font-size: 12px; color: var(--text3); margin-top: 4px; }
+.stat-card.accent { border-color: var(--blue-mid); background: var(--blue-bg); }
+.stat-card.accent .stat-card-val { color: var(--blue); }
+
+/* ── STUDENT GRID ── */
+.student-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+}
+.stu-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 13px 13px 11px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+  position: relative;
+}
+.stu-card:hover {
+  border-color: var(--blue);
+  box-shadow: var(--shadow);
+  transform: translateY(-1px);
+}
+.stu-card:active { transform: translateY(0); }
+
+.stu-card.f-disc  { border-color: #FDBA74; background: #FFFBF7; }
+.stu-card.f-att   { border-color: #93C5FD; background: #F8FBFF; }
+.stu-card.f-both  { border-color: #F87171; background: #FFF8F8; }
+
+.stu-num { font-size: 10px; color: var(--text3); margin-bottom: 5px; font-weight: 500; }
+.stu-name { font-size: 13px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+.stu-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 7px; }
+.mini-tag {
+  font-size: 10px; font-weight: 600;
+  padding: 2px 6px; border-radius: 5px;
+}
+
+/* ── PAGE SECTIONS ── */
+.page-sec { display: none; }
+.page-sec.active { display: block; }
+
+/* ── MODAL ── */
+.modal-bg {
+  display: none; position: fixed; inset: 0;
+  background: rgba(15, 14, 12, 0.5);
+  backdrop-filter: blur(3px);
+  z-index: 300;
+  align-items: flex-start; justify-content: center;
+  padding: 32px 16px;
+  overflow-y: auto;
+}
+.modal-bg.open { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  width: min(680px, 100%);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: modal-in 0.18s ease;
+}
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-head {
+  padding: 22px 24px 0;
+  background: var(--surface);
+}
+.modal-hero { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+.modal-avatar {
+  width: 48px; height: 48px; border-radius: 14px;
+  background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+  color: #fff; font-size: 18px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+}
+.modal-name { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+.modal-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.modal-close {
+  margin-left: auto;
+  width: 34px; height: 34px;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px; color: var(--text2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.12s;
+}
+.modal-close:hover { background: var(--surface3); }
+
+.modal-tabs {
+  display: flex; border-bottom: 1px solid var(--border);
+}
+.modal-tab {
+  padding: 10px 20px;
+  font-size: 13px; font-weight: 500; font-family: inherit;
+  color: var(--text3); border: none; background: none;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.12s;
+}
+.modal-tab.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 700; }
+
+.modal-body { padding: 22px 24px 24px; max-height: 70vh; overflow-y: auto; }
+
+/* ── LOG ITEMS ── */
+.log-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.log-item {
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 13px 15px;
+  background: var(--surface2);
+  transition: border-color 0.12s;
+}
+.log-item:hover { border-color: var(--border2); }
+.log-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 7px; }
+.log-date { font-size: 11px; color: var(--text3); font-weight: 500; }
+.log-badge {
+  font-size: 11px; font-weight: 700;
+  padding: 3px 9px; border-radius: 6px;
+}
+.log-text { font-size: 13px; color: var(--text); line-height: 1.65; }
+.log-actions { display: flex; gap: 6px; margin-top: 9px; }
+.btn-xs {
+  font-size: 11px; font-weight: 500; font-family: inherit;
+  padding: 4px 10px;
+  border: 1px solid var(--border2);
+  border-radius: 6px; cursor: pointer;
+  background: var(--surface); color: var(--text2);
+  transition: background 0.12s, border-color 0.12s;
+}
+.btn-xs:hover { background: var(--surface3); }
+.btn-xs.del { border-color: #FECACA; color: var(--red); }
+.btn-xs.del:hover { background: var(--red-bg); }
+
+/* ── FORM AREA ── */
+.form-sep { height: 1px; background: var(--border); margin: 18px 0; }
+.form-head { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 14px; }
+.form-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.form-row { margin-bottom: 10px; }
+.form-lbl {
+  display: block; font-size: 11px; font-weight: 700;
+  color: var(--text3); text-transform: uppercase;
+  letter-spacing: 0.05em; margin-bottom: 5px;
+}
+input[type=date], select, textarea {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  background: var(--surface);
+  font-size: 13px; font-family: inherit; color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+  appearance: none;
+}
+input[type=date]:focus, select:focus, textarea:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+}
+textarea { resize: vertical; min-height: 76px; line-height: 1.6; }
+.form-btns { display: flex; gap: 8px; margin-top: 14px; }
+
+.btn-primary {
+  padding: 9px 20px;
+  background: var(--blue); color: #fff;
+  border: none; border-radius: var(--r);
+  font-size: 13px; font-weight: 700; font-family: inherit;
+  cursor: pointer; letter-spacing: -0.01em;
+  box-shadow: 0 1px 3px rgba(37,99,235,0.3);
+  transition: opacity 0.12s, transform 0.1s;
+}
+.btn-primary:hover { opacity: 0.9; }
+.btn-primary:active { transform: scale(0.98); }
+.btn-ghost {
+  padding: 9px 16px;
+  background: none; color: var(--text2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  font-size: 13px; font-family: inherit; cursor: pointer;
+}
+.btn-ghost:hover { background: var(--surface2); }
+
+/* ── ATTENDANCE PILLS ── */
+.att-summary { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 16px; }
+.att-pill {
+  font-size: 12px; font-weight: 700;
+  padding: 5px 13px; border-radius: 99px;
+  border: 1px solid transparent;
+}
+
+/* ── EMPTY STATE ── */
+.empty {
+  text-align: center; padding: 32px 16px;
+  color: var(--text3); font-size: 13px;
+}
+.empty-icon { font-size: 32px; margin-bottom: 8px; opacity: 0.5; }
+
+/* ── STATS ── */
+.stats-section { margin-bottom: 36px; }
+.stats-section-title {
+  font-size: 13px; font-weight: 700; color: var(--text);
+  margin-bottom: 14px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+  letter-spacing: -0.01em;
+}
+.chart-row { display: flex; flex-direction: column; gap: 9px; }
+.chart-item { display: flex; align-items: center; gap: 12px; }
+.chart-lbl { font-size: 12px; color: var(--text2); width: 100px; flex-shrink: 0; text-align: right; line-height: 1.3; }
+.chart-track {
+  flex: 1; height: 22px;
+  background: var(--surface3);
+  border-radius: 6px; overflow: hidden;
+}
+.chart-fill { height: 100%; border-radius: 6px; transition: width 0.5s cubic-bezier(.4,0,.2,1); }
+.chart-n { font-size: 12px; color: var(--text3); width: 28px; flex-shrink: 0; font-weight: 600; }
+
+.rtable { width: 100%; border-collapse: collapse; font-size: 13px; }
+.rtable th {
+  text-align: left; padding: 9px 12px;
+  background: var(--surface2);
+  color: var(--text3); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+.rtable th:first-child { border-radius: var(--r) 0 0 0; }
+.rtable th:last-child  { border-radius: 0 var(--r) 0 0; }
+.rtable td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
+.rtable tr:last-child td { border-bottom: none; }
+.rtable tr:hover td { background: var(--surface2); }
+
+.att-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.att-stat-card {
+  border-radius: var(--r-lg); padding: 14px 15px;
+  border: 1px solid transparent;
+}
+.att-stat-card .num { font-size: 26px; font-weight: 700; line-height: 1; margin-bottom: 4px; letter-spacing: -0.03em; }
+.att-stat-card .sub { font-size: 11px; opacity: 0.75; font-weight: 500; }
+.att-stat-card .tag { font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+
+@media (max-width: 720px) {
+  .sidebar { width: 100%; height: auto; position: relative; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--border); }
+  .sb-brand, .sb-nav { display: none; }
+  .sb-bans { display: flex; flex-direction: row; padding: 8px; flex: none; }
+  .ban-btn { white-space: nowrap; }
+  .app { flex-direction: column; }
+  .stat-strip, .att-stat-grid { grid-template-columns: repeat(2,1fr); }
+  .form-2col { grid-template-columns: 1fr; }
+  .content { padding: 16px; }
+  .topbar { padding: 12px 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-brand-mark">
+        <div class="sb-icon">📋</div>
+        <div class="sb-name">생활지도</div>
+      </div>
+      <div class="sb-desc">2학년 누가기록 시스템</div>
+    </div>
+
+    <div class="sb-nav">
+      <div class="sb-nav-label">메뉴</div>
+      <button class="nav-btn active" id="nav-record" onclick="setPage('record')">
+        <span class="nav-icon">🗂</span> 기록 관리
+      </button>
+      <button class="nav-btn" id="nav-stats" onclick="setPage('stats')">
+        <span class="nav-icon">📊</span> 통계
+      </button>
+    </div>
+
+    <div class="sb-bans">
+      <div class="sb-nav-label" style="padding:0 8px;margin-bottom:8px">반 선택</div>
+      <div id="ban-list"></div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ── -->
+  <div class="main">
+
+    <!-- topbar -->
+    <div class="topbar">
+      <div>
+        <span class="topbar-title" id="page-title">1반</span>
+        <span class="topbar-sub" id="page-sub" style="margin-left:8px"></span>
+      </div>
+      <div class="topbar-right">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-input" type="text" id="search-input"
+            placeholder="이름 검색..." oninput="renderStudents()">
+        </div>
+      </div>
+    </div>
+
+    <!-- record page -->
+    <div class="page-sec active" id="page-record">
+      <div class="content">
+        <div class="stat-strip" id="stat-strip"></div>
+        <div class="student-grid" id="student-grid"></div>
+      </div>
+    </div>
+
+    <!-- stats page -->
+    <div class="page-sec" id="page-stats">
+      <div class="content">
+        <div id="stats-body"></div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ── MODAL ── -->
+<div class="modal-bg" id="modal-bg" onclick="closeBg(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-hero">
+        <div class="modal-avatar" id="m-avatar"></div>
+        <div>
+          <div class="modal-name" id="m-name"></div>
+          <div class="modal-sub"  id="m-sub"></div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tab-disc" onclick="switchTab('discipline')">생활지도</button>
+        <button class="modal-tab"        id="tab-att"  onclick="switchTab('attendance')">근태</button>
+      </div>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const STUDENTS_RAW = [
+  [1,1,'강민석'],[1,2,'강민주'],[1,3,'김대현'],[1,4,'김도연'],[1,5,'김민결'],
+  [1,6,'김민주'],[1,7,'김성진'],[1,8,'김태훈'],[1,9,'김하연'],[1,10,'노가온'],
+  [1,11,'박정민'],[1,12,'박찬민'],[1,13,'방예준'],[1,14,'변무혁'],[1,15,'서아린'],
+  [1,16,'안채훈'],[1,17,'오현준'],[1,18,'오훈'],[1,19,'유서현'],[1,20,'유해인'],
+  [1,21,'장우진'],[1,22,'장유찬'],[1,23,'정해솔'],[1,24,'표지호'],[1,25,'허성재'],
+  [2,1,'공명준'],[2,2,'김규리'],[2,3,'김민서'],[2,4,'김소명'],[2,5,'김유리'],
+  [2,6,'김태우'],[2,7,'박건'],[2,8,'박종진'],[2,9,'박준서'],[2,10,'성희정'],
+  [2,11,'신지훈'],[2,12,'윤지환'],[2,13,'이도경'],[2,14,'이준서'],[2,15,'이지훈'],
+  [2,16,'전우성'],[2,17,'조예찬'],[2,18,'주현서'],[2,19,'지현우'],[2,20,'천지호'],
+  [2,21,'최수환'],[2,22,'표민호'],[2,23,'한지혜'],[2,24,'황준영'],
+  [3,1,'강민준'],[3,2,'김규민'],[3,3,'김민'],[3,4,'김범모'],[3,5,'김수현'],
+  [3,6,'김예준'],[3,7,'김은빈'],[3,8,'김지혜'],[3,9,'김하은'],[3,10,'김혜원'],
+  [3,11,'문민희'],[3,12,'박해환'],[3,13,'서현우'],[3,14,'송유찬'],[3,15,'송현서'],
+  [3,16,'유승민'],[3,17,'윤우현'],[3,18,'이나연'],[3,19,'이수연'],[3,20,'임도훈'],
+  [3,21,'장지영'],[3,22,'최유빈'],[3,23,'한경석'],[3,24,'한별'],[3,25,'신지원'],
+  [4,1,'장채림'],[4,2,'강예슬'],[4,3,'김나연'],[4,4,'김은지'],[4,5,'김주은'],
+  [4,6,'박서연'],[4,7,'박종수'],[4,8,'박채원'],[4,9,'송유준'],[4,10,'오민지'],
+  [4,11,'옥성환'],[4,12,'우하은'],[4,13,'유시현'],[4,14,'윤서진'],[4,15,'이다현'],
+  [4,16,'이도영'],[4,17,'이예은'],[4,18,'이은채'],[4,19,'이종관'],[4,20,'이준민'],
+  [4,21,'정현진'],[4,22,'최서연'],[4,23,'최예나'],[4,24,'홍서윤'],[4,25,'황시온'],
+  [5,1,'강주영'],[5,2,'권지수'],[5,3,'김민재'],[5,4,'김병주'],[5,5,'김상연'],
+  [5,6,'김서희'],[5,7,'김소은'],[5,8,'김은효'],[5,9,'김희망'],[5,10,'류동준'],
+  [5,11,'박규리'],[5,12,'박세준'],[5,13,'설효준'],[5,14,'손서영'],[5,15,'송윤서'],
+  [5,16,'양서현'],[5,17,'여상윤'],[5,18,'유현규'],[5,19,'이하담'],[5,20,'임효현'],
+  [5,21,'전제황'],[5,22,'전진'],[5,23,'정다은'],[5,24,'정민서'],[5,25,'최종우'],
+  [6,1,'고아라'],[6,2,'김경주'],[6,3,'김선우'],[6,4,'김용훈'],[6,5,'김정환'],
+  [6,6,'문소영'],[6,7,'박예원'],[6,8,'박유찬'],[6,9,'박하은'],[6,10,'배서현'],
+  [6,11,'설주영'],[6,12,'오유빈'],[6,13,'유세은'],[6,14,'이송민'],[6,15,'이채린'],
+  [6,16,'장민준'],[6,17,'정은별'],[6,18,'최수호'],[6,19,'최시후'],[6,20,'최영환'],
+  [6,21,'최유영'],[6,22,'한상웅'],[6,23,'허원준'],[6,24,'홍선우'],
+  [7,1,'곽경훈'],[7,2,'구향희'],[7,3,'김수민'],[7,4,'김준서'],[7,5,'박재현'],
+  [7,6,'박정현'],[7,7,'서민경'],[7,8,'서재형'],[7,9,'유가빈'],[7,10,'이다혜'],
+  [7,11,'이동건'],[7,12,'이시아'],[7,13,'이재윤'],[7,14,'이준혁'],[7,15,'임동혁'],
+  [7,16,'임선민'],[7,17,'장승혁'],[7,18,'장형준'],[7,19,'정민창'],[7,20,'정윤채'],
+  [7,21,'정태은'],[7,22,'조은아'],[7,23,'최예인'],[7,24,'최정우'],
+  [8,1,'권다움'],[8,2,'권아름'],[8,3,'김가온'],[8,4,'김보민'],[8,5,'김태윤'],
+  [8,6,'김현민'],[8,7,'노가람'],[8,8,'문서현'],[8,9,'박경민'],[8,10,'박지환'],
+  [8,11,'박진성'],[8,12,'박한별'],[8,13,'서지영'],[8,14,'석수빈'],[8,15,'신규민'],
+  [8,16,'이규진'],[8,17,'이수연'],[8,18,'이시우'],[8,19,'이예서'],[8,20,'이지민'],
+  [8,21,'이현승'],[8,22,'채정우'],[8,23,'최민우'],[8,24,'최승아'],
+  [9,1,'강윤하'],[9,2,'권준성'],[9,3,'김가은'],[9,4,'김단아'],[9,5,'김우성'],
+  [9,6,'김정은'],[9,7,'김지후'],[9,8,'김태연'],[9,9,'김하진'],[9,10,'남예서'],
+  [9,11,'남유주'],[9,12,'도찬'],[9,13,'백수진'],[9,14,'양승혁'],[9,15,'유하린'],
+  [9,16,'윤현아'],[9,17,'이서이'],[9,18,'이지민'],[9,19,'이지훈'],[9,20,'정재우'],
+  [9,21,'정희진'],[9,22,'조은아'],[9,23,'함세령'],[9,24,'허찬규']
+];
+
+const BANS = [...new Set(STUDENTS_RAW.map(r=>r[0]))].sort((a,b)=>a-b);
+
+const DISC_CATS = [
+  { key:'교사지시불이행', label:'교사 지시 불이행', color:'#7C3A1E', bg:'#FDF0EA' },
+  { key:'스마트기기',     label:'스마트 기기 무단 사용', color:'#1A4D7C', bg:'#E8F2FC' },
+  { key:'수업태도',       label:'수업 태도 불량',   color:'#5C4A00', bg:'#FDF6DC' },
+  { key:'언어폭력',       label:'언어 폭력',         color:'#5C1A4A', bg:'#FBEAF5' },
+  { key:'폭력',           label:'폭력·다툼',         color:'#7C1A1A', bg:'#FDEAEA' },
+  { key:'기타',           label:'기타',              color:'#3D4038', bg:'#EEECEA' },
+];
+
+const ATT_CATS = [
+  { key:'미인정지각', label:'미인정 지각', color:'#92400E', bg:'#FEF3C7', border:'#FDE68A' },
+  { key:'미인정조퇴', label:'미인정 조퇴', color:'#1E3A8A', bg:'#DBEAFE', border:'#BFDBFE' },
+  { key:'미인정결과', label:'미인정 결과', color:'#581C87', bg:'#F3E8FF', border:'#E9D5FF' },
+  { key:'미인정결석', label:'미인정 결석', color:'#991B1B', bg:'#FEE2E2', border:'#FECACA' },
+];
+
+let discLogs = {}, attLogs = {};
+function load(){ try{discLogs=JSON.parse(localStorage.getItem('disc_v2')||'{}')}catch(e){discLogs={}} try{attLogs=JSON.parse(localStorage.getItem('att_v2')||'{}')}catch(e){attLogs={}} }
+function save(){ localStorage.setItem('disc_v2',JSON.stringify(discLogs)); localStorage.setItem('att_v2',JSON.stringify(attLogs)); }
+const sid = (b,n) => `${b}-${n}`;
+const today = () => new Date().toISOString().split('T')[0];
+
+let curBan=1, curPage='record', modalSid=null, modalTab='discipline', editDisc=null, editAtt=null;
+
+load();
+buildSidebar();
+setBan(1);
+
+function buildSidebar(){
+  const el = document.getElementById('ban-list');
+  el.innerHTML = BANS.map(b=>{
+    const total = STUDENTS_RAW.filter(r=>r[0]===b).reduce((s,r)=>(discLogs[sid(b,r[1])]||[]).length+(attLogs[sid(b,r[1])]||[]).length+s,0);
+    return `<button class="ban-btn${b===curBan?' active':''}" id="ban-btn-${b}" onclick="setBan(${b})">
+      <span class="ban-dot">${b}</span>
+      <span class="ban-name">${b}반</span>
+      ${total?`<span class="ban-cnt">${total}</span>`:''}
+    </button>`;
+  }).join('');
+}
+
+function setBan(b){
+  curBan=b;
+  document.querySelectorAll('.ban-btn').forEach(e=>e.classList.remove('active'));
+  document.getElementById(`ban-btn-${b}`)?.classList.add('active');
+  document.getElementById('search-input').value='';
+  renderPage();
+}
+
+function setPage(p){
+  curPage=p;
+  document.querySelectorAll('.page-sec').forEach(e=>e.classList.remove('active'));
+  document.getElementById(`page-${p}`).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(e=>e.classList.remove('active'));
+  document.getElementById(`nav-${p}`).classList.add('active');
+  if(p==='stats') renderStats();
+}
+
+function renderPage(){
+  const studs = STUDENTS_RAW.filter(r=>r[0]===curBan);
+  document.getElementById('page-title').textContent = `${curBan}반`;
+  document.getElementById('page-sub').textContent = `${studs.length}명`;
+
+  const tD = studs.reduce((s,r)=>(discLogs[sid(curBan,r[1])]||[]).length+s,0);
+  const tA = studs.reduce((s,r)=>(attLogs[sid(curBan,r[1])]||[]).length+s,0);
+  const fD = studs.filter(r=>(discLogs[sid(curBan,r[1])]||[]).length>0).length;
+  const fA = studs.filter(r=>(attLogs[sid(curBan,r[1])]||[]).length>0).length;
+
+  document.getElementById('stat-strip').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-card-label">재적</div>
+      <div class="stat-card-val">${studs.length}</div>
+      <div class="stat-card-unit">명</div>
+    </div>
+    <div class="stat-card ${tD>0?'accent':''}">
+      <div class="stat-card-label">생활지도 기록</div>
+      <div class="stat-card-val">${tD}</div>
+      <div class="stat-card-unit">건 · ${fD}명</div>
+    </div>
+    <div class="stat-card ${tA>0?'accent':''}">
+      <div class="stat-card-label">근태 기록</div>
+      <div class="stat-card-val">${tA}</div>
+      <div class="stat-card-unit">건 · ${fA}명</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-label">기록 없는 학생</div>
+      <div class="stat-card-val">${studs.length - Math.max(fD,fA)}</div>
+      <div class="stat-card-unit">명</div>
+    </div>
+  `;
+  renderStudents();
+}
+
+function renderStudents(){
+  const q = document.getElementById('search-input').value.trim();
+  const list = q ? STUDENTS_RAW.filter(r=>r[2].includes(q)) : STUDENTS_RAW.filter(r=>r[0]===curBan);
+  const grid = document.getElementById('student-grid');
+  if(!list.length){ grid.innerHTML='<div style="grid-column:1/-1;padding:48px;text-align:center;color:var(--text3)">검색 결과 없음</div>'; return; }
+
+  grid.innerHTML = list.map(r=>{
+    const s = sid(r[0],r[1]);
+    const dl = discLogs[s]||[], al = attLogs[s]||[];
+    const hasD=dl.length>0, hasA=al.length>0;
+    const cls = hasD&&hasA?'f-both':hasD?'f-disc':hasA?'f-att':'';
+
+    const dCnts={}, aCnts={};
+    dl.forEach(l=>dCnts[l.cat]=(dCnts[l.cat]||0)+1);
+    al.forEach(l=>aCnts[l.cat]=(aCnts[l.cat]||0)+1);
+
+    const dTags = Object.entries(dCnts).map(([cat,n])=>{
+      const d=DISC_CATS.find(c=>c.key===cat)||{color:'#555',bg:'#eee'};
+      return `<span class="mini-tag" style="background:${d.bg};color:${d.color}">${shortD(cat)} ${n}</span>`;
+    }).join('');
+    const aTags = Object.entries(aCnts).map(([cat,n])=>{
+      const d=ATT_CATS.find(c=>c.key===cat)||{color:'#555',bg:'#eee'};
+      return `<span class="mini-tag" style="background:${d.bg};color:${d.color}">${shortA(cat)} ${n}</span>`;
+    }).join('');
+
+    const numPart = q
+      ? `<span style="font-size:10px;color:var(--text3)">${r[0]}반 ${r[1]}번</span>`
+      : `<div class="stu-num">${r[1]}번</div>`;
+
+    return `<div class="stu-card ${cls}" onclick="openModal(${r[0]},${r[1]},'${r[2]}')">
+      ${numPart}
+      <div class="stu-name">${r[2]}</div>
+      ${dTags||aTags?`<div class="stu-tags">${dTags}${aTags}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+const shortD = k => ({교사지시불이행:'지시',스마트기기:'기기',수업태도:'태도',언어폭력:'언어',폭력:'폭력',기타:'기타'}[k]||k);
+const shortA = k => ({미인정지각:'지각',미인정조퇴:'조퇴',미인정결과:'결과',미인정결석:'결석'}[k]||k);
+
+// ── MODAL ──
+function openModal(ban,num,name){
+  modalSid=sid(ban,num); modalTab='discipline'; editDisc=null; editAtt=null;
+  document.getElementById('m-avatar').textContent=name[0];
+  document.getElementById('m-name').textContent=name;
+  document.getElementById('m-sub').textContent=`2학년 ${ban}반 ${num}번`;
+  document.getElementById('tab-disc').classList.add('active');
+  document.getElementById('tab-att').classList.remove('active');
+  renderModalBody();
+  document.getElementById('modal-bg').classList.add('open');
+}
+function closeModal(){ document.getElementById('modal-bg').classList.remove('open'); modalSid=null; }
+function closeBg(e){ if(e.target===document.getElementById('modal-bg')) closeModal(); }
+function switchTab(t){
+  modalTab=t; editDisc=null; editAtt=null;
+  document.getElementById('tab-disc').classList.toggle('active',t==='discipline');
+  document.getElementById('tab-att').classList.toggle('active',t==='attendance');
+  renderModalBody();
+}
+function renderModalBody(){
+  document.getElementById('modal-body').innerHTML =
+    modalTab==='discipline' ? buildDiscBody() : buildAttBody();
+}
+
+function buildDiscBody(){
+  const logs = (discLogs[modalSid]||[]).slice().reverse();
+  const listHtml = logs.length
+    ? logs.map((l,ri)=>{
+        const idx=(discLogs[modalSid]||[]).length-1-ri;
+        const d=DISC_CATS.find(c=>c.key===l.cat)||{label:l.cat,color:'#555',bg:'#eee'};
+        return `<div class="log-item" id="di-${idx}">
+          <div class="log-top">
+            <span class="log-date">${l.date}</span>
+            <span class="log-badge" style="background:${d.bg};color:${d.color}">${d.label}</span>
+          </div>
+          <div class="log-text">${esc(l.content)}</div>
+          <div class="log-actions" id="da-${idx}">
+            <button class="btn-xs" onclick="editDiscStart(${idx})">✏ 수정</button>
+            <button class="btn-xs del" onclick="discDelConfirm(${idx})">🗑 삭제</button>
+          </div>
+        </div>`;
+      }).join('')
+    : `<div class="empty"><div class="empty-icon">📋</div>생활지도 기록이 없습니다</div>`;
+
+  return `<div class="log-list">${listHtml}</div>
+    <div class="form-sep"></div>
+    <div class="form-head" id="disc-fh">새 기록 추가</div>
+    <div class="form-2col">
+      <div><label class="form-lbl">날짜</label><input type="date" id="fd-date" value="${today()}"></div>
+      <div><label class="form-lbl">위반 유형</label>
+        <select id="fd-cat">${DISC_CATS.map(c=>`<option value="${c.key}">${c.label}</option>`).join('')}</select>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-lbl">상황 기록</label>
+      <textarea id="fd-content" placeholder="상황을 구체적으로 기록하세요..."></textarea>
+    </div>
+    <div class="form-btns">
+      <button class="btn-primary" onclick="saveDisc()">저장</button>
+      <button class="btn-ghost" id="disc-cancel" style="display:none" onclick="cancelDisc()">취소</button>
+    </div>`;
+}
+
+function buildAttBody(){
+  const logs = (attLogs[modalSid]||[]).slice().reverse();
+  const cnts={};
+  (attLogs[modalSid]||[]).forEach(l=>cnts[l.cat]=(cnts[l.cat]||0)+1);
+  const pillsHtml = ATT_CATS.filter(c=>cnts[c.key]).map(c=>
+    `<span class="att-pill" style="background:${c.bg};color:${c.color};border-color:${c.border}">${c.label} <strong>${cnts[c.key]}회</strong></span>`
+  ).join('');
+
+  const listHtml = logs.length
+    ? logs.map((l,ri)=>{
+        const idx=(attLogs[modalSid]||[]).length-1-ri;
+        const d=ATT_CATS.find(c=>c.key===l.cat)||{label:l.cat,color:'#555',bg:'#eee'};
+        return `<div class="log-item" id="ai-${idx}">
+          <div class="log-top">
+            <span class="log-date">${l.date}</span>
+            <span class="log-badge" style="background:${d.bg};color:${d.color}">${d.label}</span>
+          </div>
+          <div class="log-text">${esc(l.content||'(사유 없음)')}</div>
+          <div class="log-actions" id="aa-${idx}">
+            <button class="btn-xs" onclick="editAttStart(${idx})">✏ 수정</button>
+            <button class="btn-xs del" onclick="attDelConfirm(${idx})">🗑 삭제</button>
+          </div>
+        </div>`;
+      }).join('')
+    : `<div class="empty"><div class="empty-icon">📅</div>근태 기록이 없습니다</div>`;
+
+  return `${pillsHtml?`<div class="att-summary">${pillsHtml}</div>`:''}
+    <div class="log-list">${listHtml}</div>
+    <div class="form-sep"></div>
+    <div class="form-head" id="att-fh">근태 기록 추가</div>
+    <div class="form-2col">
+      <div><label class="form-lbl">날짜</label><input type="date" id="fa-date" value="${today()}"></div>
+      <div><label class="form-lbl">유형</label>
+        <select id="fa-cat">${ATT_CATS.map(c=>`<option value="${c.key}">${c.label}</option>`).join('')}</select>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-lbl">사유 · 비고</label>
+      <textarea id="fa-content" placeholder="사유나 상황을 기록하세요..."></textarea>
+    </div>
+    <div class="form-btns">
+      <button class="btn-primary" onclick="saveAtt()">저장</button>
+      <button class="btn-ghost" id="att-cancel" style="display:none" onclick="cancelAtt()">취소</button>
+    </div>`;
+}
+
+// ── DISC CRUD ──
+function saveDisc(){
+  const date=document.getElementById('fd-date').value;
+  const cat=document.getElementById('fd-cat').value;
+  const content=document.getElementById('fd-content').value.trim();
+  if(!date||!content){ alert('날짜와 내용을 입력하세요.'); return; }
+  if(!discLogs[modalSid]) discLogs[modalSid]=[];
+  if(editDisc!==null){ discLogs[modalSid][editDisc]={date,cat,content}; editDisc=null; }
+  else discLogs[modalSid].push({date,cat,content});
+  save(); buildSidebar(); renderPage(); renderModalBody();
+}
+function editDiscStart(idx){
+  editDisc=idx; const l=discLogs[modalSid][idx]; renderModalBody();
+  document.getElementById('fd-date').value=l.date;
+  document.getElementById('fd-cat').value=l.cat;
+  document.getElementById('fd-content').value=l.content;
+  document.getElementById('disc-fh').textContent='기록 수정';
+  document.getElementById('disc-cancel').style.display='';
+}
+function cancelDisc(){ editDisc=null; renderModalBody(); }
+function discDelConfirm(idx){
+  const el=document.getElementById(`da-${idx}`); if(!el) return;
+  el.innerHTML=`<span style="font-size:12px;color:var(--text2)">정말 삭제할까요?</span>
+    <button class="btn-xs del" onclick="deleteDisc(${idx})">삭제</button>
+    <button class="btn-xs" onclick="renderModalBody()">취소</button>`;
+}
+function deleteDisc(idx){
+  discLogs[modalSid].splice(idx,1);
+  if(!discLogs[modalSid].length) delete discLogs[modalSid];
+  save(); buildSidebar(); renderPage(); renderModalBody();
+}
+
+// ── ATT CRUD ──
+function saveAtt(){
+  const date=document.getElementById('fa-date').value;
+  const cat=document.getElementById('fa-cat').value;
+  const content=document.getElementById('fa-content').value.trim();
+  if(!date){ alert('날짜를 선택하세요.'); return; }
+  if(!attLogs[modalSid]) attLogs[modalSid]=[];
+  if(editAtt!==null){ attLogs[modalSid][editAtt]={date,cat,content}; editAtt=null; }
+  else attLogs[modalSid].push({date,cat,content});
+  save(); buildSidebar(); renderPage(); renderModalBody();
+}
+function editAttStart(idx){
+  editAtt=idx; const l=attLogs[modalSid][idx]; renderModalBody();
+  document.getElementById('fa-date').value=l.date;
+  document.getElementById('fa-cat').value=l.cat;
+  document.getElementById('fa-content').value=l.content||'';
+  document.getElementById('att-fh').textContent='기록 수정';
+  document.getElementById('att-cancel').style.display='';
+}
+function cancelAtt(){ editAtt=null; renderModalBody(); }
+function attDelConfirm(idx){
+  const el=document.getElementById(`aa-${idx}`); if(!el) return;
+  el.innerHTML=`<span style="font-size:12px;color:var(--text2)">정말 삭제할까요?</span>
+    <button class="btn-xs del" onclick="deleteAtt(${idx})">삭제</button>
+    <button class="btn-xs" onclick="renderModalBody()">취소</button>`;
+}
+function deleteAtt(idx){
+  attLogs[modalSid].splice(idx,1);
+  if(!attLogs[modalSid].length) delete attLogs[modalSid];
+  save(); buildSidebar(); renderPage(); renderModalBody();
+}
+
+// ── STATS ──
+function renderStats(){
+  const aD=Object.values(discLogs).flat(), aA=Object.values(attLogs).flat();
+  const tD=aD.length, tA=aA.length;
+  const sD=Object.values(discLogs).filter(l=>l.length>0).length;
+  const sA=Object.values(attLogs).filter(l=>l.length>0).length;
+
+  const dCat={};aD.forEach(l=>dCat[l.cat]=(dCat[l.cat]||0)+1);
+  const aCat={};aA.forEach(l=>aCat[l.cat]=(aCat[l.cat]||0)+1);
+  const maxD=Math.max(...Object.values(dCat),1);
+  const maxA=Math.max(...Object.values(aCat),1);
+
+  const aStuCat={};
+  ATT_CATS.forEach(c=>{ aStuCat[c.key]=STUDENTS_RAW.filter(r=>(attLogs[sid(r[0],r[1])]||[]).some(l=>l.cat===c.key)).length; });
+
+  const aBanCat={};
+  BANS.forEach(b=>{ aBanCat[b]={}; ATT_CATS.forEach(c=>aBanCat[b][c.key]=0);
+    STUDENTS_RAW.filter(r=>r[0]===b).forEach(r=>{
+      (attLogs[sid(b,r[1])]||[]).forEach(l=>{ if(aBanCat[b][l.cat]!==undefined) aBanCat[b][l.cat]++; });
+    });
+  });
+  const aTotalBan={};
+  BANS.forEach(b=>aTotalBan[b]=ATT_CATS.reduce((s,c)=>s+aBanCat[b][c.key],0));
+
+  const dBan={};
+  BANS.forEach(b=>dBan[b]=STUDENTS_RAW.filter(r=>r[0]===b).reduce((s,r)=>(discLogs[sid(b,r[1])]||[]).length+s,0));
+  const maxBD=Math.max(...Object.values(dBan),1);
+
+  const rank=STUDENTS_RAW.map(r=>{
+    const s=sid(r[0],r[1]), ad={};
+    ATT_CATS.forEach(c=>ad[c.key]=0);
+    (attLogs[s]||[]).forEach(l=>{ if(ad[l.cat]!==undefined) ad[l.cat]++; });
+    return {name:r[2],ban:r[0],disc:(discLogs[s]||[]).length,att:(attLogs[s]||[]).length,ad,total:(discLogs[s]||[]).length+(attLogs[s]||[]).length};
+  }).filter(s=>s.total>0).sort((a,b)=>b.total-a.total).slice(0,15);
+
+  document.getElementById('stats-body').innerHTML = `
+    <div class="stat-strip" style="margin-bottom:32px">
+      <div class="stat-card"><div class="stat-card-label">전체 생활지도</div><div class="stat-card-val">${tD}</div><div class="stat-card-unit">건 · ${sD}명</div></div>
+      <div class="stat-card"><div class="stat-card-label">전체 근태</div><div class="stat-card-val">${tA}</div><div class="stat-card-unit">건 · ${sA}명</div></div>
+      <div class="stat-card"><div class="stat-card-label">전체 학생</div><div class="stat-card-val">${STUDENTS_RAW.length}</div><div class="stat-card-unit">명</div></div>
+      <div class="stat-card"><div class="stat-card-label">전체 반 수</div><div class="stat-card-val">${BANS.length}</div><div class="stat-card-unit">개 반</div></div>
+    </div>
+
+    <div class="stats-section">
+      <div class="stats-section-title">근태 유형별 현황</div>
+      <div class="att-stat-grid">
+        ${ATT_CATS.map(c=>`<div class="att-stat-card" style="background:${c.bg};border-color:${c.border}">
+          <div class="tag" style="color:${c.color}">${c.label}</div>
+          <div class="num" style="color:${c.color}">${aCat[c.key]||0}</div>
+          <div class="sub" style="color:${c.color}">건 · ${aStuCat[c.key]}명</div>
+        </div>`).join('')}
+      </div>
+      <div class="chart-row">
+        ${ATT_CATS.map(c=>`<div class="chart-item">
+          <div class="chart-lbl">${c.label}</div>
+          <div class="chart-track"><div class="chart-fill" style="width:${Math.round(((aCat[c.key]||0)/maxA)*100)}%;background:${c.color}"></div></div>
+          <div class="chart-n">${aCat[c.key]||0}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="stats-section">
+      <div class="stats-section-title">반별 근태 유형별 현황</div>
+      <div style="overflow-x:auto">
+        <table class="rtable">
+          <thead><tr>
+            <th>반</th>
+            ${ATT_CATS.map(c=>`<th style="text-align:center"><span style="background:${c.bg};color:${c.color};padding:2px 8px;border-radius:5px;font-size:10px;white-space:nowrap">${c.label}</span></th>`).join('')}
+            <th style="text-align:center">합계</th>
+          </tr></thead>
+          <tbody>
+            ${BANS.map(b=>`<tr>
+              <td style="font-weight:700">${b}반</td>
+              ${ATT_CATS.map(c=>`<td style="text-align:center">
+                ${aBanCat[b][c.key]>0
+                  ?`<span style="background:${c.bg};color:${c.color};padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700">${aBanCat[b][c.key]}</span>`
+                  :`<span style="color:var(--text3)">-</span>`}
+              </td>`).join('')}
+              <td style="text-align:center;font-weight:700">${aTotalBan[b]||0}</td>
+            </tr>`).join('')}
+            <tr style="background:var(--surface2)">
+              <td style="font-weight:700;font-size:11px;color:var(--text3)">합계</td>
+              ${ATT_CATS.map(c=>`<td style="text-align:center;font-weight:700">${aCat[c.key]||0}</td>`).join('')}
+              <td style="text-align:center;font-weight:700">${tA}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="stats-section">
+      <div class="stats-section-title">생활지도 위반 유형별</div>
+      <div class="chart-row">
+        ${DISC_CATS.map(c=>`<div class="chart-item">
+          <div class="chart-lbl">${c.label}</div>
+          <div class="chart-track"><div class="chart-fill" style="width:${Math.round(((dCat[c.key]||0)/maxD)*100)}%;background:${c.color}"></div></div>
+          <div class="chart-n">${dCat[c.key]||0}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="stats-section">
+      <div class="stats-section-title">반별 생활지도 기록 현황</div>
+      <div class="chart-row">
+        ${BANS.map(b=>`<div class="chart-item">
+          <div class="chart-lbl">${b}반</div>
+          <div class="chart-track"><div class="chart-fill" style="width:${Math.round(((dBan[b]||0)/maxBD)*100)}%;background:var(--blue)"></div></div>
+          <div class="chart-n">${dBan[b]||0}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    ${rank.length?`<div class="stats-section">
+      <div class="stats-section-title">누적 기록 상위 학생</div>
+      <div style="overflow-x:auto">
+        <table class="rtable">
+          <thead><tr>
+            <th style="width:36px">#</th><th>이름</th><th>반</th>
+            <th style="text-align:center">생활지도</th>
+            ${ATT_CATS.map(c=>`<th style="text-align:center;font-size:10px">${c.label.replace('미인정 ','')}</th>`).join('')}
+            <th style="text-align:center">합계</th>
+          </tr></thead>
+          <tbody>
+            ${rank.map((s,i)=>`<tr>
+              <td style="color:var(--text3);font-size:12px">${i+1}</td>
+              <td style="font-weight:700">${s.name}</td>
+              <td>${s.ban}반</td>
+              <td style="text-align:center">${s.disc>0?`<span style="background:#FDF0EA;color:#7C3A1E;padding:2px 8px;border-radius:5px;font-size:12px;font-weight:700">${s.disc}</span>`:'-'}</td>
+              ${ATT_CATS.map(c=>`<td style="text-align:center">${s.ad[c.key]>0?`<span style="background:${c.bg};color:${c.color};padding:2px 8px;border-radius:5px;font-size:12px;font-weight:700">${s.ad[c.key]}</span>`:'-'}</td>`).join('')}
+              <td style="text-align:center"><strong>${s.total}</strong></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`:`<div class="empty" style="padding:48px"><div class="empty-icon">📊</div>아직 기록이 없습니다</div>`}
+  `;
+}
+
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+</script>
+</body>
+</html>
